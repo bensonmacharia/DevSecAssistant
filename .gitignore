@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+
+# Virtual environments
+venv/
+.venv/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Editor and operating system files
+.DS_Store
+.vscode/
+.idea/
+
+# Local data and runtime artifacts
+data/index/
+data/processed/
+logs/
+
+# Editor settings
+.vscode/
