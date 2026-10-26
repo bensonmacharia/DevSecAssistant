@@ -61,7 +61,7 @@ class DevSecAssistant:
             model_name=self.llm_model,
         )
 
-        result["abstained"] = False
+        result["abstained"] = result.get("abstained", False)
         result["retrieved_count"] = len(passages)
         result["used_evidence_count"] = len(relevant_passages)
 

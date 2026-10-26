@@ -9,6 +9,27 @@ from src.devsecassistant.citation_validation import (
 DEFAULT_LLM_MODEL = "qwen2.5-coder:7b"
 
 
+def indicates_insufficient_evidence(answer: str) -> bool:
+    """Detect explicit statements that the evidence cannot answer the question."""
+    text = " ".join(answer.lower().split())
+
+    insufficient_evidence_phrases = (
+        "the available evidence is insufficient",
+        "the evidence is insufficient",
+        "there is insufficient evidence",
+        "i could not find sufficient evidence",
+        "i could not find evidence",
+        "i could not find sufficiently relevant evidence",
+        "the retrieved evidence does not provide",
+        "the provided evidence does not provide",
+        "the evidence does not support an answer",
+        "i cannot answer this question from the provided evidence",
+        "i can't answer this question from the provided evidence",
+    )
+
+    return any(phrase in text for phrase in insufficient_evidence_phrases)
+
+
 def generate_answer(
     question: str,
     passages: list[dict[str, Any]],
@@ -34,6 +55,7 @@ def generate_answer(
             "sources": [],
             "citation_valid": False,
             "citation_errors": ["No evidence passages were supplied."],
+            "abstained": True,
         }
 
     # Assign a stable evidence ID to each passage for this generation call.
@@ -151,4 +173,5 @@ Use citations such as [S1] to identify the evidence supporting your answer.
         "sources": sources,
         "citation_valid": citation_result["citation_valid"],
         "citation_errors": citation_result["citation_errors"],
+        "abstained": indicates_insufficient_evidence(raw_answer),
     }
