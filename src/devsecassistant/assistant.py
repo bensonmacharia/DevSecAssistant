@@ -6,6 +6,9 @@ from src.devsecassistant.pipeline import build_index
 from src.devsecassistant.retrieval import DEFAULT_MODEL, SemanticRetriever
 
 
+ABSTENTION_MESSAGE = "I don't have an answer for that."
+
+
 class DevSecAssistant:
     """Question-answering assistant grounded in indexed documents."""
 
@@ -46,13 +49,13 @@ class DevSecAssistant:
 
         if not relevant_passages:
             return {
-                "answer": (
-                    "I could not find sufficiently relevant evidence "
-                    "in the indexed documents to answer this question."
-                ),
+                "answer": ABSTENTION_MESSAGE,
                 "sources": [],
                 "abstained": True,
                 "retrieved_count": len(passages),
+                "used_evidence_count": 0,
+                "citation_valid": None,
+                "citation_errors": [],
             }
 
         result = generate_answer(
@@ -64,5 +67,11 @@ class DevSecAssistant:
         result["abstained"] = result.get("abstained", False)
         result["retrieved_count"] = len(passages)
         result["used_evidence_count"] = len(relevant_passages)
+
+        if result["abstained"]:
+            result["answer"] = ABSTENTION_MESSAGE
+            result["sources"] = []
+            result["citation_valid"] = None
+            result["citation_errors"] = []
 
         return result
